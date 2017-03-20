@@ -22,10 +22,54 @@ Source code includes code from:
 
 ## Quickstart
 
-TODO: coming shortly, for now see Makefile and setupsd.sh
+Just compile the tool using:
+
+```
+$ make
+$ ./setupsd.sh /dev/sdX
+```
+
+`/dev/sdX` is the path to the SD-card which should be flashed with the image.
+
+**Test system: Freescale i.MX53 Quick Start Board _ARM Cortex-A8_**
 
 Required tools:
 - arm-none-eabi-gcc
 - arm-none-eabi-binutils
 - arm-none-eabi-newlib
+
+
+
+## Makefile Options
+
+There are a couple of Makefile options:
+
+#### Cleanup
+Use `make clean` to clean the compiled files.
+
+#### Logging and Printing
+- `make info` - print some logging information
+- `make smc` - print also the secure monitor calls (includes `info`)
+- `make debug` - very verbose logging level (includes `info` and `smc`)
+
+#### Timing analysis
+- `make timingTz` - will compile a special image used for timing TrustZone
+- `make timingNoTz` - will compile a special image used for timing the system without TrustZone
+
+#### TrustZone
+Normally the operating system will always be compiled for TrustZone. If that is
+not desired, there is the option to compile using `make noTz`, even though we
+recommend to compile with TrustZone.
+
+
+
+## Attack and Self-healing
+
+**Remark: by default the buffer overflow was turned off. To turn it on, one has to supply the compilation flag `BUFFEROVERFLOW`. See also file `./Demo/Drivers/IO.c`. Note that there is no Makefile option to supply this flag directly to prevent accidentially compiling a vulnerable image.**
+
+TODO
+
+![Attack](./attack.png "Attack")
+
+
 
