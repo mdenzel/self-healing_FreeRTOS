@@ -11,13 +11,13 @@
 #
 
 ### CONFIG ###
-io=/dev/ttyUSB0
+io=/dev/ttyUSB0 #the serial connection to the i.MX53 Quick Start Board
 ##############
 
 if [ $# -eq 1 ]; then
-    hex=`echo "obase=16; $1" | bc`
-    echo -e "update 1234561234567890\x$hex" > $io
-    echo -e "status" > $io
+    hex=`echo "obase=16; $1" | bc` #cast the temperature into base 16
+    echo -e "update 1234561234567890\x$hex" > $io #overflow buffer and write the new temperature
+    echo -e "status" > $io #send a status to show self-healing
 else
-    echo "Usage: $0 <number>"
+    echo "Usage: $0 <number (new max temperature)>"
 fi

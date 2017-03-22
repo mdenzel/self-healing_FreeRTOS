@@ -9,8 +9,9 @@
 @version:      0.1
 ```
 
-An ARM TrustZone port of FreeRTOS V9.0.0rc1 which can automatically self-heal
-from certain attacks and runs on top of ARM TrustZone.
+A **_proof-of-concept implementation_** of an ARM TrustZone port of FreeRTOS
+V9.0.0rc1 which can automatically self-heal from certain attacks and runs on top
+of ARM TrustZone.
 
 Source code includes code from:
 - FreeRTOS V9.0.0rc1 -- www.freertos.org
@@ -65,11 +66,49 @@ recommend to compile with TrustZone.
 
 ## Attack and Self-healing
 
-**Remark: by default the buffer overflow was turned off. To turn it on, one has to supply the compilation flag `BUFFEROVERFLOW`. See also file `./Demo/Drivers/IO.c`. Note that there is no Makefile option to supply this flag directly to prevent accidentially compiling a vulnerable image.**
+**Remark: by default the buffer overflow was turned off. To turn it on, one has
+  to supply the compilation flag `BUFFEROVERFLOW`. See also file
+  `./Demo/Drivers/IO.c`. Note that there is no Makefile option to supply this
+  flag directly to prevent accidentially compiling a vulnerable image.**
 
-TODO
+#### Background
 
-![Attack](./attack.png "Attack")
+To test the self-healing capabilities of our adjusted FreeRTOS operating system,
+we simulated a simple temperature sensor and included a buffer overflow using
+the vulnerable C function `strcpy` (see `./Demo/Drivers/IO.c`).
 
+The function `set_config_temperature` can update the struct of the temperature
+sensor with a new "info" string. However, the buffer is only 16 bytes long and
+can be overflowed. This enables an attacker to change the `max` and `min`
+temperature fields (and of course various other memory attacks).
 
+Our self-healing capability (see `./Demo/TrustZone/selfhealing.c::detection()`)
+checks that the `max` temperature is below 100 degrees for task3.  **Note: this
+is just a proof-of-concept implementation, a full implementation would have to
+check also the `min` temperature, the variables of task1 and task2, that no
+further tasks exists, and so on. But, this should be enough to demonstrate the
+basic idea of self-healing**
 
+#### Example Run
+
+The following picture shows an example run of `./attack.sh` which overwrites the
+`max` temperature with 150 degrees. User inputs are highlighted in green, these
+are in this case the actual attack input.
+
+![Attack example](./attack.png "Attack example")
+
+Explanations:
+
+After all three tasks are started, the attacker updates the "info" string to
+1234561234567890 plus the binary number for 150. On can see three lines later
+that FreeRTOS reports back the temperature as `[0; 150]`. Immediately
+afterwards, self-healing takes place which can be seen at the reset task3 (it
+says again "task3 start" because task3 was deleted and restarted). When the
+attacker sends the next `status` command, the system already reset the
+temperature to the initial value `[0; 100]` and "info" to the initial value
+"init".
+
+This implementation is not bulletproof of course. An adversary could still
+attack the self-healing functionality directly or circumvent it another way.
+However, since the self-healing functionality is part of the ARM TrustZone
+secure world, this is considerably more effort.
