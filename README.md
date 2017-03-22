@@ -69,7 +69,7 @@ recommend to compile with TrustZone.
 **Remark: by default the buffer overflow was turned off. To turn it on, one has
   to supply the compilation flag `BUFFEROVERFLOW`. See also file
   `./Demo/Drivers/IO.c`. Note that there is no Makefile option to supply this
-  flag directly to prevent accidentially compiling a vulnerable image.**
+  flag directly to prevent accidentally compiling a vulnerable image.**
 
 #### Background
 
