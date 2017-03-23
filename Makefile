@@ -132,7 +132,5 @@ $(BUILD_DIR)/FreeRTOS/MemMang/%.o: FreeRTOS/Source/portable/MemMang/%.c
 # --- TARGET ---
 kernel.img: kernel.ld $(OBJS)
 	@$(CC) $(OBJS) -Wl,-T kernel.ld -Wl,$(LDFLAGS) -nostartfiles -o $(BUILD_DIR)/kernel.elf
-#did not work:
-#	$(LD) $(OBJS) -T kernel.ld -o $(BUILD_DIR)/kernel.elf $(LDFLAGS)
 	@$(OBJDUMP) -D $(BUILD_DIR)/kernel.elf > $(BUILD_DIR)/kernel.asm #for debugging purposes
 	@$(OBJCOPY) $(BUILD_DIR)/kernel.elf -O binary kernel.img

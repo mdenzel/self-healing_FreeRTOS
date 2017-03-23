@@ -143,7 +143,7 @@ void controltask(void *pParam){
           cprintf("config: '%s'\n[%d; %d]\ntemp: %d\n", conf.info, conf.min, conf.max, t);
         }
         else if(strncmp(buf, "update ", 7) == 0){
-          //update sensor.info (incl. a buffer overflow!)
+          //update sensor.info (incl. a buffer overflow depending on compilation)
           cprintf("updating\n");
           set_config_temperature(buf+7);
           temperature conf = get_config_temperature();

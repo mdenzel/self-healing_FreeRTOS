@@ -35,7 +35,7 @@ $ ./setupsd.sh /dev/sdX
 **Test system: Freescale i.MX53 Quick Start Board _ARM Cortex-A8_**
 
 Required tools:
-- arm-none-eabi-gcc
+- arm-none-eabi-gcc (version 6.2.0)
 - arm-none-eabi-binutils
 - arm-none-eabi-newlib
 
