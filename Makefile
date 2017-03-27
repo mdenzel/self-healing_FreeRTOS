@@ -52,7 +52,7 @@ OBJS += $(BUILD_DIR)/FreeRTOS/GCC/portisr.o
 CFLAGS = -Wall -nostdlib -nostartfiles -ffreestanding -mcpu=cortex-a8 -DCORTEX_A8 -I Demo -I Demo/Drivers -I Demo/TrustZone -I Demo/Tasks -I Demo/Analysis -I FreeRTOS/Source/include -I FreeRTOS/Source/portable/GCC -I FreeRTOS/Source/portable/MemMang -std=c99 -DTRUSTZONE
 ASFLAGS = -Wall -mcpu=cortex-a8
 CPPFLAGS = -DTRUSTZONE
-LDFLAGS = -L "/usr/lib/gcc/arm-none-eabi/6.2.0" -lgcc -L "/usr/arm-none-eabi/lib" -lc
+LDFLAGS = -L "/usr/lib/gcc/arm-none-eabi/5.2.0" -lgcc -L "/usr/arm-none-eabi/lib" -lc
 
 # --- Compilation ---
 .phony: all noTZ dir clean debug smc info timingTz timingNoTz
