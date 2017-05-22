@@ -38,6 +38,7 @@ Required tools:
 - arm-none-eabi-gcc (version 5.2.0)
 - arm-none-eabi-binutils
 - arm-none-eabi-newlib
+- uboot-utils (for mkimage)
 
 
 
