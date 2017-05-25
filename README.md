@@ -35,10 +35,26 @@ $ ./setupsd.sh /dev/sdX
 **Test system: Freescale i.MX53 Quick Start Board _ARM Cortex-A8_**
 
 Required tools:
-- arm-none-eabi-gcc (version 5.2.0)
+- arm-none-eabi-gcc (version 5.2.0, arm-none-eabi-as/-ld 2.27)
 - arm-none-eabi-binutils
 - arm-none-eabi-newlib
+- mkimage (version 2016.05)
+- (minicom or similar)
 
+To connect to the board:
+```
+$ minicom -s -c on
+
+goto Serial port setup and set the following:
+Serial Device:			/dev/ttyUSB0 (or where mounted)
+Callin Program:			(empty)
+Callout Program:		(empty)
+Bps/Par/Bits:			115200 8N1
+Hardware Flow Control:	No (important!)
+Software Flow Control:	No
+
+(start)
+```
 
 
 ## Makefile Options

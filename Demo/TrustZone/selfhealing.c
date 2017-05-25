@@ -173,7 +173,7 @@ void restoration(void* malicious_task){
   print_MODE();
   print_WORLD();
   cprintf("\e[0m");
-  cprintf("\e[0;31mdetection IRQ: %d, FIQ: %d\e[0m\n", CheckIRQ(), CheckFIQ());
+  cprintf("\e[0;31mrestoration: IRQ: %d, FIQ: %d\e[0m\n", CheckIRQ(), CheckFIQ());
 #endif
   
   //get number of task
@@ -183,27 +183,43 @@ void restoration(void* malicious_task){
   cprintf("\e[0;31mrestoration: removing %s\e[0m\n", ((MiniTCB_t*)malicious_task)->name);
 #endif
   vTaskDelete(malicious_task);
-  //recreate task
-#ifdef INFO
-  cprintf("\e[0;31mrestoration: recreating task %d\e[0m\n", tasknum);
+  //FIXME: something enables IRQ/FIQ before here (vTaskDelete!)
+#ifdef DEBUG
+  cprintf("restoration: IRQ: %d, FIQ: %d\n", CheckIRQ(), CheckFIQ());
 #endif
-  if(xTaskCreate(TASK_FUNCTIONS[tasknum-1], TASK_NAMES[tasknum-1], 256,
-                 TASK_NAMES[tasknum-1], TASK_PRIOS[tasknum-1], NULL) != pdPASS){
-    char* err = malloc(32);
-    sprintf(err, "could not re-create task %u\n", tasknum);
-    kernelpanic(err);
-  }
-
+  
   //restore sensor/actuators/data
 #ifdef INFO
   cprintf("\e[0;31mrestoration: restoring temp sensor\e[0m\n");
 #endif
   //IMPROVE: restoration for now hard-coded (should be pulled from server)
   reset_temperature();
-  
+
+  //recreate task
+#ifdef INFO
+  cprintf("\e[0;31mrestoration: recreating task num %d\e[0m\n", tasknum);
+#endif
+
+  DisableInterrupts();
+  vTaskSuspendAll();
+  {
+#ifdef DEBUG
+    //IRQ/FIQ should be off!
+    cprintf("restoration xTaskCreate: IRQ: %d, FIQ: %d\n", CheckIRQ(), CheckFIQ());
+#endif
+    if(xTaskCreate(TASK_FUNCTIONS[tasknum-1], TASK_NAMES[tasknum-1], 256,
+                   TASK_NAMES[tasknum-1], TASK_PRIOS[tasknum-1], NULL) != pdPASS){
+      char* err = malloc(32);
+      sprintf(err, "could not re-create task %u\n", tasknum);
+      kernelpanic(err);
+    }
 #ifdef INFO
   cprintf("\e[0;31m-- restoration for %s done --\e[0m\n", ((MiniTCB_t*)malicious_task)->name);
 #endif
+  }//finished => resume scheduler
+  xTaskResumeAll();
+  EnableInterrupts();
+  
   //remove this restoration task
   vTaskDelete(NULL);
 }

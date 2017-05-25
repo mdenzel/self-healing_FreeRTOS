@@ -246,7 +246,7 @@ void vPortExitCritical( void )
 			__asm volatile (
 				"STMDB	SP!, {R0}		\n\t"	/* Push R0.						*/
 				"MRS	R0, CPSR		\n\t"	/* Get CPSR.					*/
-				"BIC	R0, R0, #0xC0	\n\t"	/* Enable IRQ, FIQ.				*/
+				"BIC	R0, R0, #0xC0	\n\t"	/* Enable IRQ, FIQ.				*/ //FIXME: this enables IRQ+FIQ no matter what the state before was
 				"MSR	CPSR, R0		\n\t"	/* Write back modified value.	*/
 				"LDMIA	SP!, {R0}" );			/* Pop R0.						*/
 		}
