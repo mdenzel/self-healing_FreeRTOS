@@ -38,7 +38,7 @@ Required tools:
 - arm-none-eabi-gcc (version 5.2.0, arm-none-eabi-as/-ld 2.27)
 - arm-none-eabi-binutils
 - arm-none-eabi-newlib
-- mkimage (version 2016.05)
+- uboot-utils (for mkimage, version 2016.05)
 - (minicom or similar)
 
 To connect to the board:
