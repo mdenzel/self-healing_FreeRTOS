@@ -23,7 +23,7 @@ Source code includes code from:
 
 ## Quickstart
 
-Just compile the tool using:
+1;2802;0cJust compile the tool using:
 
 ```
 $ make
@@ -35,10 +35,10 @@ $ ./setupsd.sh /dev/sdX
 **Test system: Freescale i.MX53 Quick Start Board _ARM Cortex-A8_**
 
 Required tools:
-- arm-none-eabi-gcc (version 5.2.0, arm-none-eabi-as/-ld 2.27)
+- arm-none-eabi-gcc (worked with version 5.2.0, arm-none-eabi-as/-ld 2.27)
 - arm-none-eabi-binutils
 - arm-none-eabi-newlib
-- uboot-utils (for mkimage, version 2016.05)
+- uboot-utils (for mkimage, worked with version 2016.05)
 - (minicom or similar)
 
 To connect to the board:
@@ -128,10 +128,4 @@ This implementation is not bulletproof of course. An adversary could still
 attack the self-healing functionality directly or circumvent it another way.
 However, since the self-healing functionality is part of the ARM TrustZone
 secure world, this is considerably more effort.
-
-
-## Known Issues
-
-Compilation with version 6.2.0 of arm-none-eabi-gcc (libgcc) compiles fine but
-the I/O input via serial connection does not work.
 
