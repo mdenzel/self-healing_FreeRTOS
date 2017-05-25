@@ -46,12 +46,12 @@ To connect to the board:
 $ minicom -s -c on
 
 goto Serial port setup and set the following:
-Serial Device:			/dev/ttyUSB0 (or where mounted)
-Callin Program:			(empty)
-Callout Program:		(empty)
-Bps/Par/Bits:			115200 8N1
-Hardware Flow Control:	No (important!)
-Software Flow Control:	No
+Serial Device:          /dev/ttyUSB0 (or where mounted)
+Callin Program:         (empty)
+Callout Program:        (empty)
+Bps/Par/Bits:           115200 8N1
+Hardware Flow Control:  No (important!)
+Software Flow Control:  No
 
 (start)
 ```
