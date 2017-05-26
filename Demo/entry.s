@@ -503,7 +503,14 @@ smc_switch_world_sw_nw:
     mcr p15, 0, r0, c1, c1, 0				@ Write Secure Configuration Register data
     mov r0, #0                              @ clear r0
     msr cpsr_c, #Mode_SVC | I_Bit | F_Bit   @ switch to SVC mode
-    bl vPortEnterCritical                   @ enter critical to avoid FreeRTOS enabling interrupts
+    @bl vPortEnterCritical                   @ enter critical to avoid FreeRTOS enabling interrupts
+    push {r0, r1}
+    ldr r0, =ulCriticalNesting
+    ldr r1, [r0]
+    add r1, r1, #1
+    str r1, [r0]
+    pop {r0, r1}
+    
     bl detection
     @ exit critical section without enabling interrupts (~vPortExitCritical)
     @ (these will be enabled by SPSR during movs pc, lr below

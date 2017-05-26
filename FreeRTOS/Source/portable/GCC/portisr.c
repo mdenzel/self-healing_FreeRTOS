@@ -38,9 +38,14 @@
 
 /* Scheduler includes. */
 #include "FreeRTOS.h"
+#include "list.h"
 #include "mxc_serial.h"
 #include "interrupts.h"
 #include "trustzone.h"
+
+#include <stdlib.h> //for malloc
+#include <stdio.h> //for sprintf
+#include "kernelpanic.h"
 
 //optional includes
 #ifdef TIMING
@@ -54,6 +59,19 @@
 /* Constants required to handle critical sections. */
 #define portNO_CRITICAL_NESTING		( ( uint32_t ) 0 )
 volatile uint32_t ulCriticalNesting = 9999UL;
+
+//types
+typedef struct tskTaskControlBlock
+{
+  StackType_t* topOfStack;
+  ListItem_t   unused1;
+  ListItem_t   unused2;
+  UBaseType_t  prio;
+  StackType_t* stack;
+  char         name[ configMAX_TASK_NAME_LEN ];
+  uint8_t	   savedFIQIRQ;
+} MiniTCB_t;
+
 
 /*-----------------------------------------------------------*/
 
@@ -217,13 +235,36 @@ be saved to the stack.  Instead the critical section nesting level is stored
 in a variable, which is then saved as part of the stack context. */
 void vPortEnterCritical( void )
 {
+#ifdef DEBUG
+  cprintf("IRQ: %d, FIQ: %d\n", CheckIRQ(), CheckFIQ());
+  cprintf("vPortEnterCritical CritNesting %u savedFIQIRQ %x\n", ulCriticalNesting, ((MiniTCB_t*)pxCurrentTCB)->savedFIQIRQ);
+#endif
+  
 	/* Disable interrupts as per portDISABLE_INTERRUPTS(); 							*/
-	__asm volatile (
+  unsigned int reg = 0;
+  __asm volatile("MRS %[Rd], CPSR" : [Rd] "=r" (reg));
+  __asm volatile (
 		"STMDB	SP!, {R0}			\n\t"	/* Push R0.								*/
 		"MRS	R0, CPSR			\n\t"	/* Get CPSR.							*/
 		"ORR	R0, R0, #0xC0		\n\t"	/* Disable IRQ, FIQ.					*/
 		"MSR	CPSR, R0			\n\t"	/* Write back modified value.			*/
-		"LDMIA	SP!, {R0}" );				/* Pop R0.								*/
+		"LDMIA	SP!, {R0}"  				/* Pop R0.								*/
+    );
+
+    //check if we are the first vPortEnterCritical
+    if( ulCriticalNesting == portNO_CRITICAL_NESTING ){
+      if(((MiniTCB_t*)pxCurrentTCB)->savedFIQIRQ != 0){
+        char* err = malloc(64);
+        sprintf(err, "vPortEnterCritical: savedFIQIRQ not 0 (%s %x)\n",
+                ((MiniTCB_t*)pxCurrentTCB)->name,
+                ((MiniTCB_t*)pxCurrentTCB)->savedFIQIRQ);
+        kernelpanic(err);
+      }
+      //save CPSR (for enabling interrupts below)
+      //FIQ=0x40, IRQ=0x80 => 0xC0
+      cprintf("vPortEnterCritical: %x\n", reg);
+      ((MiniTCB_t*)pxCurrentTCB)->savedFIQIRQ = (uint8_t)(reg & 0xC0);
+    }
 
 	/* Now interrupts are disabled ulCriticalNesting can be accessed
 	directly.  Increment ulCriticalNesting to keep a count of how many times
@@ -233,6 +274,10 @@ void vPortEnterCritical( void )
 
 void vPortExitCritical( void )
 {
+#ifdef DEBUG
+  cprintf("vPortExitCritical CritNesting %u savedFIQIRQ %x\n", ulCriticalNesting-1, ((MiniTCB_t*)pxCurrentTCB)->savedFIQIRQ);
+#endif
+  
 	if( ulCriticalNesting > portNO_CRITICAL_NESTING )
 	{
 		/* Decrement the nesting count as we are leaving a critical section. */
@@ -243,12 +288,18 @@ void vPortExitCritical( void )
 		if( ulCriticalNesting == portNO_CRITICAL_NESTING )
 		{
 			/* Enable interrupts as per portEXIT_CRITICAL().					*/
+          unsigned int reg = (unsigned int)((MiniTCB_t*)pxCurrentTCB)->savedFIQIRQ;
+          reg = (reg ^ 0xC0) & 0xC0; //XOR AND with 0xC0 because we do a bit clear (BIC) below, thus we need to inverse the mask
+            ((MiniTCB_t*)pxCurrentTCB)->savedFIQIRQ = 0;
 			__asm volatile (
 				"STMDB	SP!, {R0}		\n\t"	/* Push R0.						*/
 				"MRS	R0, CPSR		\n\t"	/* Get CPSR.					*/
-				"BIC	R0, R0, #0xC0	\n\t"	/* Enable IRQ, FIQ.				*/ //FIXME: this enables IRQ+FIQ no matter what the state before was
+				"BIC	R0, R0, %[Wr]	\n\t"	/* Enable IRQ, FIQ.				*/ //FIXME
 				"MSR	CPSR, R0		\n\t"	/* Write back modified value.	*/
-				"LDMIA	SP!, {R0}" );			/* Pop R0.						*/
+				"LDMIA	SP!, {R0}"				/* Pop R0.						*/
+                : /*outputoperands empty*/
+                : [Wr] "r" (reg) /*inputoperand*/
+              );
 		}
 	}
 }

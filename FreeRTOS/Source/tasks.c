@@ -154,6 +154,10 @@ typedef struct tskTaskControlBlock
 	StackType_t			*pxStack;			/*< Points to the start of the stack. */
 	char				pcTaskName[ configMAX_TASK_NAME_LEN ];/*< Descriptive name given to the task when created.  Facilitates debugging only. */ /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 
+    //FIXME: this could result in problems
+    //added savedFIQIRQ to tskTCB
+    volatile uint8_t savedFIQIRQ;
+  
 	#if ( portSTACK_GROWTH > 0 )
 		StackType_t		*pxEndOfStack;		/*< Points to the end of the stack on architectures where the stack grows up from low memory. */
 	#endif
@@ -3000,6 +3004,9 @@ UBaseType_t x;
 	was greater or equal to configMAX_TASK_NAME_LEN. */
 	pxTCB->pcTaskName[ configMAX_TASK_NAME_LEN - 1 ] = '\0';
 
+    //initialise savedFIQIRQ
+    pxTCB->savedFIQIRQ = 0;
+    
 	/* This is used as an array index so must ensure it's not too large.  First
 	remove the privilege bit if one is present. */
 	if( uxPriority >= ( UBaseType_t ) configMAX_PRIORITIES )
