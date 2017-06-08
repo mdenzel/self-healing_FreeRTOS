@@ -129,3 +129,7 @@ attack the self-healing functionality directly or circumvent it another way.
 However, since the self-healing functionality is part of the ARM TrustZone
 secure world, this is considerably more effort.
 
+
+## Known Issues
+
+- bug in the interrupt system
