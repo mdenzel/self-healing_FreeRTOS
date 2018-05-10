@@ -2,7 +2,7 @@
 # Makefile to compile the self-healing TrustZone based FreeRTOS 
 #
 # @author:       Michael Denzel
-# @email:        research@michael-denzel.de
+# @email:        md.research@mailbox.org
 # @license:      GNU General Public License 2.0 or later
 # @date:         2017-03-17
 # @version:      0.1
