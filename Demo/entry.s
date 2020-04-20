@@ -2,7 +2,7 @@
  * Main assembly file setting up and managing TrustZone (for i.MX53 board).
  *
  * @author:       Michael Denzel
- * @email:        md.research@mailbox.org
+ * @contact:      https://github.com/mdenzel
  * @license:      GNU General Public License 2.0 or later
  * @date:         2017-03-17
  * @version:      0.1
