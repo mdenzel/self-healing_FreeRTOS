@@ -20,7 +20,7 @@ Source code includes code from:
 
 ## Quickstart
 
-1;2802;0cJust compile the tool using:
+Compile the tool using:
 
 ```
 $ make
@@ -58,23 +58,36 @@ Software Flow Control:  No
 
 There are a couple of Makefile options:
 
-#### Cleanup
+### Cleanup
+
 Use `make clean` to clean the compiled files.
 
-#### Logging and Printing
+### Logging and Printing
+
 - `make info` - print some logging information
 - `make smc` - print also the secure monitor calls (includes `info`)
 - `make debug` - very verbose logging level (includes `info` and `smc`)
 
-#### Timing analysis
+### Timing analysis
+
 - `make timingTz` - will compile a special image used for timing TrustZone
 - `make timingNoTz` - will compile a special image used for timing the system without TrustZone
 
-#### TrustZone
+### TrustZone
+
 Normally the operating system will always be compiled for TrustZone. If that is
 not desired, there is the option to compile using `make noTz`, even though we
 recommend to compile with TrustZone.
 
+#### World Switches
+
+TrustZone is split into two worlds (`normal world` and `secure world`) which are
+separated by the so-called monitor. The following drawings demonstrate the switches
+in the implemented Trustzone FreeRTOS:
+
+![World Switch](./2023-11-27_Worldswitch.png "World Switch")
+
+![World Switch Code](./2023-11-27_Worldswitch_Code.png "World Switch Code")
 
 
 ## Attack and Self-healing
@@ -84,7 +97,7 @@ recommend to compile with TrustZone.
   `./Demo/Drivers/IO.c`. Note that there is no Makefile option to supply this
   flag directly to prevent accidentally compiling a vulnerable image.**
 
-#### Background
+### Background
 
 To test the self-healing capabilities of our adjusted FreeRTOS operating system,
 we simulated a simple temperature sensor and included a buffer overflow using
@@ -102,7 +115,7 @@ check also the `min` temperature, the variables of task1 and task2, that no
 further tasks exists, and so on. But, this should be enough to demonstrate the
 basic idea of self-healing**
 
-#### Example Run
+### Example Run
 
 The following picture shows an example run of `./attack.sh` which overwrites the
 `max` temperature with 150 degrees. User inputs are highlighted in green, these
