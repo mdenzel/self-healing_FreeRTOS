@@ -1,4 +1,7 @@
 
+This repository was archived and is no longer maintained.
+
+
 # Self-healing FreeRTOS
 
 ```
